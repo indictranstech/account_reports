@@ -1,0 +1,17 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2015-06-23 16:06:18.275944", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "is_standard": "Yes", 
+ "modified": "2015-06-23 16:06:18.275944", 
+ "modified_by": "Administrator", 
+ "module": "Account Reports", 
+ "name": "General Ledger Summary", 
+ "owner": "Administrator", 
+ "ref_doctype": "GL Entry", 
+ "report_name": "General Ledger Summary", 
+ "report_type": "Script Report"
+}
