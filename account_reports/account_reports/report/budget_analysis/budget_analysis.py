@@ -62,7 +62,7 @@ def get_columns(filters):
 
 			columns.append(label+":Float:150")
 
-	return columns + [_("Diffrence (%)") + ":Percent:120"]
+	return columns 
 
 
 #Get cost center & target details

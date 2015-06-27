@@ -76,7 +76,9 @@ def get_period_list(filters,fiscal_year, month, from_beginning=False):
 	
 
 	year= cint(filters["fiscal_year"].split("-")[-1]) -1
+	#frappe.errprint(year)
 	last_fiscal_year= (cint(filters["fiscal_year"].split("-")[-1])) -2 
+	#frappe.errprint(last_fiscal_year)
 	last_fiscal_year1 =(cint(filters["fiscal_year"].split("-")[-1])) -1
 	last_year = cstr(last_fiscal_year) +'-'+ cstr(last_fiscal_year1)
 	date1= '04-01-'+last_year
