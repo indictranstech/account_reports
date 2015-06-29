@@ -5,9 +5,9 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils import (flt,cint,cstr, getdate, get_first_day, get_last_day,
 	add_months, add_days, formatdate)
-import datetime
+from datetime import datetime
 from frappe import _, _dict
-
+from account_reports.account_reports.utils import get_month_details
 
 
 def execute(filters=None):
@@ -59,140 +59,45 @@ def get_period_list(filters,fiscal_year, month, from_beginning=False):
 	"""Get a list of dict {"to_date": to_date, "key": key, "label": label}
 		Periodicity can be (Yearly, Quarterly, Monthly)"""
 
-	fy_start_end_date = frappe.db.get_value("Fiscal Year", fiscal_year, ["year_start_date", "year_end_date"])
-	if not fy_start_end_date:
-		frappe.throw(_("Fiscal Year {0} not found.").format(fiscal_year))
-
-
-	start_date = getdate(fy_start_end_date[0])
-	end_date = getdate(fy_start_end_date[1])
+	month_details=get_month_details(fiscal_year,month)
 	
-	to_date = get_first_day(start_date)
-
-	from calendar import monthrange
-
-	filters["month"] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-		"Dec"].index(filters["month"]) +1
-	
-
-	year= cint(filters["fiscal_year"].split("-")[-1]) -1
-	#frappe.errprint(year)
-	last_fiscal_year= (cint(filters["fiscal_year"].split("-")[-1])) -2 
-	#frappe.errprint(last_fiscal_year)
-	last_fiscal_year1 =(cint(filters["fiscal_year"].split("-")[-1])) -1
-	last_year = cstr(last_fiscal_year) +'-'+ cstr(last_fiscal_year1)
-	date1= '04-01-'+last_year
-	start_date_last_year = getdate(date1)
-
-	if month=='Jan':
-		end_date='31-01-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-01-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Feb':
-		end_date='28-02-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '28-02-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Mar':
-		end_date='31-03-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-03-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Apr':
-		end_date='30-04-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '30-04-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='May':
-		end_date='31-05-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-05-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Jun':
-		end_date='30-06-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '30-06-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Jul':
-		end_date='31-07-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-07-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Aug':
-		end_date='31-08-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-08-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Sep':
-		end_date='30-09-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '30-09-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Oct':
-		end_date='31-10-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-10-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Nov':
-		end_date='30-11-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '30-11-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
-	elif month=='Dec':
-		end_date='31-12-'+cstr(year)
-		end_date1 = getdate(end_date)
-		last_year_to_date = '31-12-'+cstr(last_year)
-		last_year_to_date1 = getdate(last_year_to_date)
-
 
 	period_list=[]
 
 	period_list_last_year =[]
 
-	period_list.append(_dict({ "to_date": end_date1 }))
+	period_list.append(_dict({ "to_date": month_details.get('end_date1') }))
 
-	period_list_last_year.append(_dict({ "to_date": last_year_to_date1 }))
+	period_list_last_year.append(_dict({ "to_date": month_details.get('last_year_to_date1') }))
 
 	for opts in period_list:
 		opts.update({
-			"key": fiscal_year,
+			"key": month_details.get('current_fiscal_year'),
 			"label": 'This Year',
-			"year_start_date": start_date,
-			"year_end_date": end_date1
+			"year_start_date": month_details.get('start_date'),
+			"year_end_date": month_details.get('end_date1')
 		})
 
 		if from_beginning:
 			# set start date as None for all fiscal periods, used in case of Balance Sheet
 			opts["from_date"] = None
 		else:
-			opts["from_date"] = start_date
+			opts["from_date"] = month_details.get('start_date')
 
 
 	for optss in period_list_last_year:
 		optss.update({
-			"key": last_year,
+			"key": month_details.get('last_fiscal_year'),
 			"label": 'Last Year',
-			"year_start_date": start_date_last_year,
-			"year_end_date": last_year_to_date1
+			"year_start_date": month_details.get('start_date_last_year'),
+			"year_end_date": month_details.get('last_year_to_date1')
 		})
 
 		if from_beginning:
 			# set start date as None for all fiscal periods, used in case of Balance Sheet
 			optss["from_date"] = None
 		else:
-			optss["from_date"] = start_date_last_year
+			optss["from_date"] = month_details.get('start_date_last_year')
 
 	
 	return period_list ,period_list_last_year
