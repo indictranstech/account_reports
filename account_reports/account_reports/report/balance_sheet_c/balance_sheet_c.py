@@ -13,16 +13,12 @@ import frappe
 
 def execute(filters=None):
 	period_list = get_period_list(filters.fiscal_year, filters.periodicity, from_beginning=True)
-	#frappe.errprint(["period_list",period_list])
 	
 	asset = get_data(filters.company, "Asset", "Debit", period_list)
-	#frappe.errprint(["asset",asset])
 
 	liability = get_data(filters.company, "Liability", "Credit", period_list)
-	#frappe.errprint(["liability",liability])
 
 	equity = get_data(filters.company, "Equity", "Credit", period_list)
-	#frappe.errprint(["equity",equity])
 
 	provisional_profit_loss = get_provisional_profit_loss(asset, liability, equity, period_list)
 
@@ -67,7 +63,6 @@ def get_provisional_profit_loss(asset, liability, equity, period_list):
 
 
 def get_period_list(fiscal_year, periodicity, from_beginning=False):
-	#frappe.errprint("1.get prid list")
 	"""Get a list of dict {"to_date": to_date, "key": key, "label": label}
 		Periodicity can be (Yearly, Quarterly, Monthly)"""
 
@@ -118,7 +113,7 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 
 	# common processing
 	for opts in period_list:
-		#frappe.errprint(["opts",opts])
+		
 		key = opts["to_date"].strftime("%b_%Y").lower()
 		label = formatdate(opts["to_date"], "MMM YYYY")
 		opts.update({
@@ -135,20 +130,16 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 		else:
 			opts["from_date"] = start_date
 
-	#frappe.errprint(["period_list",period_list])
 	return period_list
 
 
 
 def get_data(company, root_type, balance_must_be, period_list, ignore_closing_entries=False):
-	#frappe.errprint("2 . get data")
 	accounts = get_accounts(company, root_type)
-	#frappe.errprint(["acccc",accounts])
 	if not accounts:
 		return None
 
 	accounts, accounts_by_name = filter_accounts(accounts)
-	#frappe.errprint(["accounts",accounts])
 	gl_entries_by_account = get_gl_entries(company, period_list[0]["from_date"], period_list[-1]["to_date"],
 		accounts[0].lft, accounts[0].rgt, ignore_closing_entries=ignore_closing_entries)
 
@@ -162,37 +153,37 @@ def get_data(company, root_type, balance_must_be, period_list, ignore_closing_en
 	return out
 
 def calculate_values(accounts_by_name, gl_entries_by_account, period_list):
-	#frappe.errprint("4. calculate_values")
+	
 	for entries in gl_entries_by_account.values():
 		for entry in entries:
-			#frappe.errprint(["entry",entry])
+			
 			d = accounts_by_name.get(entry.account)
-			#frappe.errprint(["d",d])
+			
 			for period in period_list:
 				# check if posting date is within the period
 				if entry.posting_date <= period.to_date:
 					d[period.key] = d.get(period.key, 0.0) + flt(entry.debit) - flt(entry.credit)
 					d[period.key2] = d.get(period.key2, 0.0) + flt(entry.debit) - flt(entry.credit)
-					#frappe.errprint(["period_key",d[period.key]])
+					
 
 
 def accumulate_values_into_parents(accounts, accounts_by_name, period_list):
 	"""accumulate children's values in parent accounts"""
 	for d in reversed(accounts):
-		#frappe.errprint(["d",d])
+		
 		if d.parent_account:
 			for period in period_list:
-				#frappe.errprint(["period_key2",period.key2])
+				
 				accounts_by_name[d.parent_account][period.key] = accounts_by_name[d.parent_account].get(period.key, 0.0) + \
 					d.get(period.key, 0.0)
 
 				accounts_by_name[d.parent_account][period.key2] = accounts_by_name[d.parent_account].get(period.key2, 0.0) + \
 					d.get(period.key2, 0.0)
 
-				#frappe.errprint(accounts_by_name[d.parent_account][period.key])
+				
 
 def prepare_data(accounts, balance_must_be, period_list):
-	#frappe.errprint("6. prepare_data")
+	
 	out = []
 	year_start_date = period_list[0]["year_start_date"].strftime("%Y-%m-%d")
 	year_end_date = period_list[-1]["year_end_date"].strftime("%Y-%m-%d")
@@ -245,10 +236,7 @@ def add_total_row(out, balance_must_be, period_list):
 	for period in period_list:
 		frappe.errprint(["oooooooo",out])
 		for index,value in enumerate(out):
-			frappe.errprint(index+1)
-			frappe.errprint(["adeggggggggggggg",value['parent_account']])
-			#frappe.errprint(out[index+1].get('parent_account'))
-			# if value['parent_account'] ==
+	
 			row[period.key] = out[index].get(period.key, 0.0)
 			out[index][period.key] = ""
 
@@ -289,8 +277,7 @@ def filter_accounts(accounts, depth=10):
 				add_to_list(child.name, level + 1)
 
 	add_to_list(None, 0)
-	# frappe.errprint(["filetered accounts",filter_accounts])
-	# frappe.errprint(["accounts_by_name",accounts_by_name])
+	
 	return filtered_accounts, accounts_by_name
 
 def sort_root_accounts(roots):

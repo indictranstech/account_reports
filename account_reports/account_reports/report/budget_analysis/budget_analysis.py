@@ -8,7 +8,9 @@ from frappe.utils import flt
 from frappe.utils import formatdate
 import time
 from erpnext.accounts.utils import get_fiscal_year
-from erpnext.controllers.trends import get_period_date_ranges, get_period_month_ranges
+from frappe.utils import getdate
+from account_reports.account_reports.utils import get_month_details
+
 
 def execute(filters=None):
 
@@ -42,7 +44,35 @@ def execute(filters=None):
 
 	return columns, sorted(data, key=lambda x: (x[0], x[1]))
 
+
+def get_period_month_ranges(period, fiscal_year):
+
+	from dateutil.relativedelta import relativedelta
+	period_month_ranges = []
+
+	for start_date, end_date in get_period_date_ranges(period, fiscal_year):
+		months_in_this_period = []
+		while start_date <= end_date:
+			months_in_this_period.append(start_date.strftime("%B"))
+
+			start_date += relativedelta(months=1)
+		period_month_ranges.append(months_in_this_period)
+
+	
+	return period_month_ranges
+
+def get_period_date_ranges(period, fiscal_year=None, year_start_date=None):
+	
+	month_details= get_month_details(fiscal_year,period)
+
+	period_date_ranges = []
+	
+	period_date_ranges.append([month_details.get('first_day'),month_details.get('end_date1')])
+
+	return period_date_ranges
+
 def get_columns(filters):
+
 	for fieldname in ["fiscal_year", "period", "company"]:
 		if not filters.get(fieldname):
 			label = (" ".join(fieldname.split("_"))).title()
@@ -51,22 +81,20 @@ def get_columns(filters):
 
 	columns = [ _("Account") + ":Link/Account:120"]
 
-	group_months = False if filters["period"] == "Monthly" else True
-
+	
 	for from_date, to_date in get_period_date_ranges(filters["period"], filters["fiscal_year"]):
-		for label in [_("Budgeted") + " (%s)", _("Selected Period") + " (%s)", _("Diffrence") + " (%s)",_("Diffrence Percentage") + " (%s)"]:
-			if group_months:
-				label = label % (formatdate(from_date, format_string="MMM") + " - " + formatdate(from_date, format_string="MMM"))
-			else:
-				label = label % formatdate(from_date, format_string="MMM")
-
+		for label in [_("Budgeted") + " (%s)", _("Selected Period") + " (%s)", _("Diffrence") + " (%s)"]:
+			label = label % formatdate(from_date, format_string="MMM")
+			
 			columns.append(label+":Float:150")
+		columns.append(_("Diffrence Percentage") + ":Percent:120")
 
 	return columns 
 
 
 #Get cost center & target details
 def get_costcenter_target_details(filters):
+
 	cost_center_details= frappe.db.sql("""select cc.name, cc.distribution_id,
 		cc.parent_cost_center, bd.account, bd.budget_allocated
 		from `tabCost Center` cc, `tabBudget Detail` bd
@@ -107,6 +135,7 @@ def get_actual_details(filters):
 	
 
 def get_costcenter_account_month_map(filters):
+
 	import datetime
 	costcenter_target_details = get_costcenter_target_details(filters)
 	tdd = get_target_distribution_details(filters)

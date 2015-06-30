@@ -9,6 +9,8 @@ from erpnext.accounts.report.financial_statements import filter_accounts, get_gl
 from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate, nowdate, \
 	get_first_day, get_last_day,money_in_words, now, nowtime
 
+#from account_reports.account_reports.utils import get_fiscal_year
+
 value_fields = ("opening_debit", "opening_credit", "debit", "credit", "closing_debit", "closing_credit","ytd_debit","ytd_credit")
 
 def execute(filters=None):
@@ -22,6 +24,8 @@ def validate_filters(filters):
 		["year_start_date", "year_end_date"])
 	filters.year_start_date = getdate(filters.year_start_date)
 	filters.year_end_date = getdate(filters.year_end_date)
+
+
 
 	if not filters.from_date:
 		filters.from_date = filters.year_start_date
@@ -121,8 +125,6 @@ def accumulate_values_into_parents(accounts, accounts_by_name):
 	for d in reversed(accounts):
 		if d.parent_account:
 			for key in value_fields:
-				frappe.errprint(d[key])
-				frappe.errprint(accounts_by_name[d.parent_account][key])
 				accounts_by_name[d.parent_account][key] += d[key]
 	
 def prepare_data(accounts, filters, total_row):
