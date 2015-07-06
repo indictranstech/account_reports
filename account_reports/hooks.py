@@ -41,6 +41,8 @@ app_version = "0.0.1"
 # Installation
 # ------------
 
+fixtures = ['Custom Field', 'Property Setter']
+
 # before_install = "account_reports.install.before_install"
 # after_install = "account_reports.install.after_install"
 
@@ -66,13 +68,24 @@ app_version = "0.0.1"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+
+	"Sales Invoice": {
+		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+
+	},
+	"Journal Entry": {
+		"on_submit":"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.update_account_receivable_with_tax_entry",
+		"on_cancel":"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.cancel_all_the_gl_entry"
+
+	},
+	"Purchase Invoice": {
+		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+
+	}
+
+
+}
 
 # Scheduled Tasks
 # ---------------

@@ -52,7 +52,7 @@ def get_gl_entries(filters):
 		group by account
 		order by posting_date , account"""\
 		.format(conditions=get_conditions(filters)),
-		filters ,as_dict=1)
+		filters ,as_dict=1,debug=1)
 
 	return gl_entries
 
