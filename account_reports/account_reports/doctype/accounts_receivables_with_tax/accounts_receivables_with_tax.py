@@ -61,6 +61,9 @@ def create_account_gl_entry_for_amount(doc,method):
 	with_tax.voucher_no = doc.name
 	with_tax.paid_amount = doc.grand_total-doc.outstanding_amount
 	with_tax.outstanding_amount= doc.outstanding_amount
+	with_tax.is_opening=doc.is_opening
+	with_tax.fiscal_year=doc.fiscal_year
+	with_tax.company= doc.company
 	with_tax.save(ignore_permissions=True)
 	
 
@@ -107,6 +110,9 @@ def make_tax_entry(doc,i,method):
 		gl_entry.outstanding_amount= doc.outstanding_amount
 		gl_entry.paid_tax_amount = 0.00
 		gl_entry.outstanding_tax_amount= tax_details[0][2]
+		gl_entry.is_opening=doc.is_opening
+		gl_entry.fiscal_year=doc.fiscal_year
+		gl_entry.company= doc.company
 		gl_entry.save(ignore_permissions=True)
 
 
@@ -145,11 +151,11 @@ def get_general_account_entries(doc,method):
 
 
 def get_credit_debit_details(doc,method,test,ledger_entries):
-	frappe.errprint(test)
+	#frappe.errprint(test)
 	outstanding_amount=[]
 	if test[2] == 'Sales Invoice':
 		outstanding_amount= frappe.db.sql("""select ifnull(outstanding_amount,0),ifnull(grand_total,0),ifnull(total,0) from `tabSales Invoice` where name ='%s' """%test[1],as_list=1,debug=1)
-		frappe.errprint(["outstanding_amount",outstanding_amount])
+		#frappe.errprint(["outstanding_amount",outstanding_amount])
 
 	elif test[2] =='Purchase Invoice':
 		outstanding_amount= frappe.db.sql("""select ifnull(outstanding_amount,0),ifnull(grand_total,0),ifnull(total,0) from `tabPurchase Invoice` where name ='%s' """%test[1],as_list=1,debug=1)
@@ -159,7 +165,7 @@ def get_credit_debit_details(doc,method,test,ledger_entries):
 	if outstanding_amount>0:
 		#frappe.errprint("firat loppp")
 		if outstanding_amount[0][0] == outstanding_amount[0][1] and outstanding_amount[0][0] == doc.total_debit:
-			frappe.errprint("amount is asma eall payment entry ata a time")
+			#frappe.errprint("amount is asma eall payment entry ata a time")
 			gl_entry_name= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' """%test[1],as_list=1)
 			#frappe.errprint(gl_entry_name)
 			if gl_entry_name:
@@ -168,9 +174,11 @@ def get_credit_debit_details(doc,method,test,ledger_entries):
 		else:
 			#frappe.errprint("else parat")
 			for j in ledger_entries:
+				account= frappe.db.sql("""select account from `tabJournal Entry Account` where parent='%s' and account!='Debtors - F'"""%doc.name,as_list=1,debug=1)
+				frappe.errprint(["account",account])
 				ledger_details=frappe.db.sql("""select account, ifnull(debit,0) , ifnull(credit,0) ,ifnull(against_invoice,0)
-												from `tabJournal Entry Account` where name = '%s'"""%j[0],as_list=1)
-				#frappe.errprint(ledger_details)
+												from `tabJournal Entry Account` where name = '%s'"""%j[0],as_list=1,debug=1)
+				frappe.errprint(["ledger_details",ledger_details])
 				if test[2] == 'Sales Invoice':
 					outstanding_amount= frappe.db.sql("""select ifnull(outstanding_amount,0),ifnull(grand_total,0),ifnull(total,0) from `tabSales Invoice` where name ='%s' """%test[1],as_list=1)
 
@@ -178,12 +186,12 @@ def get_credit_debit_details(doc,method,test,ledger_entries):
 					outstanding_amount= frappe.db.sql("""select ifnull(outstanding_amount,0),ifnull(grand_total,0),ifnull(total,0) from `tabPurchase Invoice` where name ='%s' """%test[1],as_list=1)
 
 				if ledger_details[0][0] == 'Debtors - F' or ledger_details[0][0] == 'Creditors - F':
-					#frappe.errprint("check_entry_is_available_in_gl_entry")
-					check_entry_is_available_in_gl_entry(ledger_details,test[1],outstanding_amount[0][0],test)
+					frappe.errprint("check_entry_is_available_in_gl_entry")
+					check_entry_is_available_in_gl_entry(ledger_details,test[1],outstanding_amount[0][0],test,account)
 					
 				else:
 					gl_entry_tax=check_account_is_taxaccount(ledger_details,test[1],outstanding_amount[0][0],test)
-					#frappe.errprint(["dfghjkl",gl_entry_tax])
+					frappe.errprint(["dfghjkl",gl_entry_tax])
 					if gl_entry_tax:
 						#frappe.errprint(gl_entry_tax)
 						update_gl_tax_entry(gl_entry_tax,ledger_details,test)
@@ -192,7 +200,7 @@ def get_credit_debit_details(doc,method,test,ledger_entries):
 		
 
 def check_account_is_taxaccount(ledger_details,sales_invoice,outstanding_amount,test):
-	#frappe.errprint("in check_account_is_taxaccount")
+	frappe.errprint("in check_account_is_taxaccount")
 
 	if test[2] == 'Sales Invoice':
 		account_head= frappe.db.sql("""select account_head from `tabSales Taxes and Charges` where parent='%s'"""%sales_invoice,as_list=1)
@@ -200,7 +208,7 @@ def check_account_is_taxaccount(ledger_details,sales_invoice,outstanding_amount,
 	elif test[2] == 'Purchase Invoice':
 		account_head= frappe.db.sql("""select account_head from `tabPurchase Taxes and Charges` where parent='%s'"""%sales_invoice,as_list=1)
 
-	#frappe.errprint(account_head)
+	frappe.errprint(account_head)
 	if len(account_head)>0:
 		for i in account_head:
 			if ledger_details[0][0]==i[0]:
@@ -217,7 +225,7 @@ def check_entry_is_available_in_gl_for_tax(ledger_details,sales_invoice,outstand
 	gl_entry_tax= frappe.db.sql("""select name,ifnull(outstanding_amount,0), ifnull(outstanding_tax_amount,0) from `tabAccounts Receivables With Tax` 
 		where voucher_no='%s' and account='%s' and outstanding_tax_amount>0"""%(sales_invoice,ledger_details[0][0]),as_list=1,debug=1)
 	
-	frappe.errprint(["--------------------------;",gl_entry_tax])
+	#frappe.errprint(["--------------------------;",gl_entry_tax])
 	if gl_entry_tax:
 
 		return gl_entry_tax
@@ -271,7 +279,7 @@ def update_gl_tax_entry(gl_entry_tax,ledger_details,test):
 
 			update_gl_entry_for_tax(outstanding_tax_amount,credit,paid_tax_amount,gl_entry_tax,total_outstanding_amount,test)
 
-def  check_entry_is_available_in_gl_entry(ledger_details,sales_invoice,outstanding_amount,test):
+def  check_entry_is_available_in_gl_entry(ledger_details,sales_invoice,outstanding_amount,test,account):
 	#frappe.errprint("check_entry_is_available_in_gl_entry")
 	gl_entry_name= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' and account='%s' and outstanding_amount>0"""%(sales_invoice,ledger_details[0][0]),as_list=1)
 
@@ -284,7 +292,7 @@ def  check_entry_is_available_in_gl_entry(ledger_details,sales_invoice,outstandi
 				if ledger_details[0][2] >0 :
 					credit,paid_amount,total_outstanding_amount=calculate_the_outstanding_tax_credit(gl_entry[0][0],ledger_details[0][2],test)
 					update_gl_entry(credit,paid_amount,total_outstanding_amount,i[0],test)
-					update_outstanding_amount(i[0],total_outstanding_amount,sales_invoice,test)
+					update_outstanding_amount(i[0],total_outstanding_amount,sales_invoice,test,account)
 				else:
 					credit,paid_amount,total_outstanding_amount=calculate_the_outstanding_tax_credit(gl_entry[0][0],ledger_details[0][1],test)
 					update_gl_entry(credit,paid_amount,total_outstanding_amount,i[0],test)
@@ -297,7 +305,7 @@ def  check_entry_is_available_in_gl_entry(ledger_details,sales_invoice,outstandi
 				else:
 					debit,paid_amount,total_outstanding_amount=calculate_the_outstanding_tax_debit(gl_entry[0][0],ledger_details[0][1],test)
 					update_gl_entry(debit,paid_amount,total_outstanding_amount,i[0],test)
-					update_outstanding_amount(i[0],total_outstanding_amount,sales_invoice,test)
+					update_outstanding_amount(i[0],total_outstanding_amount,sales_invoice,test,account)
 
 
 def calculate_the_outstanding_tax_credit(amount,credit,test):
@@ -355,12 +363,12 @@ def update_gl_entry(credit,paid_amount,total_outstanding_amount,gl_entry,test):
 	gl.outstanding_amount=total_outstanding_amount
 	gl.save(ignore_permissions=True)
 
-def update_outstanding_amount(gl_entry,outstanding_amount,sales_invoice,test):
+def update_outstanding_amount(gl_entry,outstanding_amount,sales_invoice,test,account):
 	if test[2]=='Sales Invoice':
 
-		gl_entry= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' and account!='Debtors - F' """%sales_invoice,as_list=1)
+		gl_entry= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' and account!='Debtors - F' and account!='%s' """%(sales_invoice,account[0][0]),as_list=1)
 	elif test[2]=='Purchase Invoice':
-		gl_entry= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' and account!='Creditors - F' """%sales_invoice,as_list=1)
+		gl_entry= frappe.db.sql("""select name from `tabAccounts Receivables With Tax` where voucher_no='%s' and account!='Creditors - F' and account!='%s'"""%(sales_invoice,account[0][0]),as_list=1)
 
 	if gl_entry:
 		for i in gl_entry:
@@ -369,7 +377,7 @@ def update_outstanding_amount(gl_entry,outstanding_amount,sales_invoice,test):
 			gl.save(ignore_permissions=True)
 
 def update_gl_entry_for_tax(outstanding_tax_amount,debit,paid_tax_amount,gl_entry_tax,total_outstanding_amount,test):
-	# frappe.errprint("update_gl_entry_for_tax")
+	frappe.errprint("update_gl_entry_for_tax")
 	# frappe.errprint(total_outstanding_amount)
 	# frappe.errprint(debit)
 	gl_tax = frappe.get_doc('Accounts Receivables With Tax', gl_entry_tax[0][0])

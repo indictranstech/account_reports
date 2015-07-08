@@ -35,12 +35,42 @@ def execute(filters=None):
 						value = flt(month_data.get(fieldname))
 						period_data[i] += value
 						totals[i] += value
-				period_data[2] = period_data[0] - period_data[1]
-				period_data[3] =(period_data[2]/period_data[0])*100
-				row += period_data
-			totals[2] = totals[0] - totals[1]
-			row += totals
-			data.append(row)
+				if period_data[0]>0 and period_data[1]==0:
+					period_data[2] = period_data[0] - period_data[1]
+
+					if period_data[2]==0:
+						period_data[3]=0
+					else:
+						period_data[3] =(period_data[2]/period_data[0])*100
+					row += period_data
+					data.append(row)
+				
+				elif period_data[0]==0 and period_data[1]>0:
+					period_data[2] = (period_data[0] - period_data[1])*(-1)
+					if period_data[2]==0:
+						period_data[3]=0
+					else:
+						period_data[3] = 'NA'
+
+					row += period_data
+					data.append(row)
+					
+				elif period_data[0]==0 and period_data[1]==0:
+					period_data[2] = 0
+					period_data[3]=0
+					row += period_data
+					data.append(row)
+
+				elif period_data[0]>0 and period_data[1]>0:
+					period_data[2] = period_data[0] - period_data[1]
+					if period_data[2]==0:
+						period_data[3]=0
+					else:
+						period_data[3] =(period_data[2]/period_data[0])*100
+
+					row += period_data
+					data.append(row)
+
 
 	return columns, sorted(data, key=lambda x: (x[0], x[1]))
 
@@ -101,7 +131,8 @@ def get_costcenter_target_details(filters):
 		where bd.parent=cc.name and bd.fiscal_year=%s and
 		cc.company=%s order by cc.name""" % ('%s', '%s'),
 		(filters.get("fiscal_year"), filters.get("company")), as_dict=1)
-	
+
+
 	return cost_center_details
 
 
@@ -153,7 +184,6 @@ def get_costcenter_account_month_map(filters):
 				}))
 
 			tav_dict = cam_map[ccd.name][ccd.account][month]
-
 			month_percentage = tdd.get(ccd.distribution_id, {}).get(month, 0) \
 				if ccd.distribution_id else 100.0/12
 
@@ -162,5 +192,4 @@ def get_costcenter_account_month_map(filters):
 			for ad in actual_details.get(ccd.name, {}).get(ccd.account, []):
 				if ad.month_name == month:
 						tav_dict.actual += flt(ad.debit) - flt(ad.credit)
-	
 	return cam_map

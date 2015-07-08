@@ -3,7 +3,13 @@
 
 frappe.query_reports["Aged Payables With Tax Details"] = {
 	"filters": [
-
+		{
+			fieldname: "fiscal_year",
+			label: __("Fiscal Year"),
+			fieldtype: "Link",
+			options: "Fiscal Year",
+			default: sys_defaults.fiscal_year
+		},
 		{
 			"fieldname":"company",
 			"label": __("Company"),

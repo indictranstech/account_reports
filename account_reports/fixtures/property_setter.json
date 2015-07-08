@@ -382,12 +382,12 @@
   "docstatus": 0, 
   "doctype": "Property Setter", 
   "doctype_or_field": "DocField", 
-  "field_name": "paid_tax_amount", 
-  "modified": "2015-07-01 18:28:43.609975", 
-  "name": "Sales Invoice-paid_tax_amount-previous_field", 
+  "field_name": "outstanding_tax_amount", 
+  "modified": "2015-07-07 14:54:35.917810", 
+  "name": "Sales Invoice-outstanding_tax_amount-previous_field", 
   "property": "previous_field", 
   "property_type": "Data", 
-  "value": "outstanding_amount"
+  "value": "paid_tax_amount"
  }, 
  {
   "default_value": null, 
@@ -395,11 +395,24 @@
   "docstatus": 0, 
   "doctype": "Property Setter", 
   "doctype_or_field": "DocField", 
-  "field_name": "outstanding_tax_amount", 
-  "modified": "2015-07-01 18:28:43.916889", 
-  "name": "Sales Invoice-outstanding_tax_amount-previous_field", 
+  "field_name": "paid_tax_amount", 
+  "modified": "2015-07-07 14:54:43.648682", 
+  "name": "Sales Invoice-paid_tax_amount-previous_field", 
   "property": "previous_field", 
   "property_type": "Data", 
-  "value": "paid_tax_amount"
+  "value": "outstanding_amount"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Budget Detail", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "root_type", 
+  "modified": "2015-07-07 15:02:19.895178", 
+  "name": "Budget Detail-root_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "fiscal_year"
  }
 ]

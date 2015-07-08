@@ -30,6 +30,7 @@ def execute(filters=None):
 	
 	provisional_profit_loss = get_provisional_profit_loss(asset, liability, equity, period_list)
 	provisional_profit_loss1 = get_provisional_profit_loss(asset1, liability1, equity1, period_list_last_year)
+	#frappe.errprint(provisional_profit_loss1)
 
 	data = []
 	data1 = []
@@ -260,6 +261,7 @@ def add_total_row(out, balance_must_be, period_list):
 		row[period.key] = out[0].get(period.key, 0.0)
 		out[0][period.key] = ""
 
+	#frappe.errprint(row)
 	out.append(row)
 
 	# blank row after Total
@@ -335,7 +337,7 @@ def get_result_as_list(data,data1,period_list,period_list_last_year):
 	for period in period_list_last_year:
 		for period2 in period_list:
 			for l in data:
-				
+				frappe.errprint(l)
 				if any(d.get("account") == l.get("account") for d in data1):
 
 					val=dict((d.get("account"),d) for d in data1) 
@@ -351,8 +353,13 @@ def get_result_as_list(data,data1,period_list,period_list_last_year):
 								if t.get("account_name"):
 
 									if t.get("account_name")[1:-1] == l.get("account_name")[1:-1]:
-
+										if t.get("account_name")[1:-1] == 'Provisional Profit / Loss (Credit)':
+											frappe.errprint("pppp")
+										if t.get("account_name")[1:-1] == 'Total (Credit)':
+											frappe.errprint("ttttttttttttt")
+										frappe.errprint(t.get(period.key))
 										l[period.key]= t.get(period.key)
+										frappe.errprint(l[period.key])
 										l['diffrence'] = l.get(period2.key)-l.get(period.key)
 										diff= (l.get("diffrence")/l.get(period.key))*100
 										
@@ -364,5 +371,7 @@ def get_result_as_list(data,data1,period_list,period_list_last_year):
 					l['diffrence']	= (l.get(period2.key))- l.get(period.key)
 			
 	 				l['diffrence_percentage'] = (l.get("diffrence")/l.get(period.key))*100
+
+	frappe.errprint(data)
 
 	return data

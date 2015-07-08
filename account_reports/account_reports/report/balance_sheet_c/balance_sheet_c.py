@@ -83,7 +83,6 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 		}[periodicity]
 
 		period_list = []
-		frappe.errprint(["-----------",months_to_add])
 		# start with first day, so as to avoid year to_dates like 2-April if ever they occur
 		to_date = get_first_day(start_date)
 
@@ -234,7 +233,6 @@ def add_total_row(out, balance_must_be, period_list):
 		"account": None
 	}
 	for period in period_list:
-		frappe.errprint(["oooooooo",out])
 		for index,value in enumerate(out):
 	
 			row[period.key] = out[index].get(period.key, 0.0)
