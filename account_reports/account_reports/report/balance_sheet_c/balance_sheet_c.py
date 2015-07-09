@@ -58,7 +58,6 @@ def get_provisional_profit_loss(asset, liability, equity, period_list):
 				has_value = True
 
 		if has_value:
-			#frappe.errprint(provisional_profit_loss)
 			return provisional_profit_loss
 
 
@@ -256,9 +255,7 @@ def filter_accounts(accounts, depth=10):
 	parent_children_map = {}
 	accounts_by_name = {}
 	for d in accounts:
-		#frappe.errprint(["d",d])
 		accounts_by_name[d.name] = d
-		#frappe.errprint(accounts_by_name[d.name])
 		parent_children_map.setdefault(d.parent_account or None, []).append(d)
 
 	filtered_accounts = []
@@ -295,7 +292,6 @@ def sort_root_accounts(roots):
 	roots.sort(compare_roots)
 
 def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closing_entries=False):
-	#frappe.errprint("3. get gl entries")
 	"""Returns a dict like { "account": [gl entries], ... }"""
 	additional_conditions = []
 
@@ -328,7 +324,6 @@ def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closi
 	return gl_entries_by_account
 
 def get_columns(period_list):
-	#frappe.errprint("end get_columns")
 	columns = [{
 		"fieldname": "account",
 		"label": _("Account"),

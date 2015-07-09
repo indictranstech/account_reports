@@ -25,7 +25,6 @@ def execute(filters=None):
 	cam_map_expense=get_costcenter_account_month_map_expense(filters,'Expense')
 
 	cam_map_goods_sold = get_costcenter_account_month_map_goods_sold(filters,'Expense')
-	#frappe.errprint(cam_map_goods_sold)
 
 	data = []
 	month_list=[]

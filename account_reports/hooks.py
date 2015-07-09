@@ -71,7 +71,8 @@ fixtures = ['Custom Field', 'Property Setter']
 doc_events = {
 
 	"Sales Invoice": {
-		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry",
+		"on_cancel": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
 
 	},
 	"Journal Entry": {
@@ -80,7 +81,8 @@ doc_events = {
 
 	},
 	"Purchase Invoice": {
-		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry",
+		"on_cancel": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
 
 	}
 

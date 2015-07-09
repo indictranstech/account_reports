@@ -5,6 +5,9 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt, getdate, cstr
 from frappe import _
+from datetime import date, timedelta
+from erpnext.accounts.utils import get_balance_on
+#class FiscalYearError(frappe.ValidationError): pass
 
 def execute(filters=None):
 	account_details = {}
@@ -24,14 +27,14 @@ def validate_filters(filters, account_details):
 		frappe.throw(_("From Date must be before To Date"))
 
 def get_columns():
-	return [_("Posting Date") + ":Date:90", _("Account") + ":Link/Account:200",_("Opening (Dr)") + ":Float:100", _("Opening (Cr)") + ":Float:100",
+	return [_("Posting Date") + ":Date:90", _("Account") + ":Link/Account:200",_("Opening") + ":Float:100", 
 		_("Debit") + ":Float:100", _("Credit") + ":Float:100",
-		_("Closing (Dr)") + ":Float:100", _("Closing (Cr)") + ":Float:100",_("Net Activity") + ":Float:100" ,
+		_("Closing") + ":Float:100",_("Net Activity") + ":Float:100" ,
 		_("Src") + "::120", _("Memo") + ":Dynamic Link/Voucher Type:160",_("Job#") + "::150"]
 
 def get_result(filters, account_details):
 	gl_entries = get_gl_entries(filters)
-
+	
 	data = get_data_with_opening_closing(filters, account_details, gl_entries)
 
 	result = get_result_as_list(data)
@@ -40,11 +43,8 @@ def get_result(filters, account_details):
 
 def get_gl_entries(filters):
 
-	gl_entries = frappe.db.sql("""select posting_date, account, sum(ifnull(debit, 0)) as opening_debit, 
-		sum(ifnull(credit, 0)) as opening_credit,
+	gl_entries = frappe.db.sql("""select posting_date, account,
 		sum(ifnull(debit, 0)) as debit, sum(ifnull(credit, 0)) as credit,
-		(sum(ifnull(debit,0))+ sum(ifnull(debit,0)) ) as closing_debit,
-		(sum(ifnull(credit,0))+ sum(ifnull(credit,0)) ) as closing_credit,
 		voucher_type, voucher_no,party
 		from `tabGL Entry`
 		where company=%(company)s {conditions}  
@@ -52,7 +52,18 @@ def get_gl_entries(filters):
 		group by account
 		order by posting_date , account"""\
 		.format(conditions=get_conditions(filters)),
-		filters ,as_dict=1,debug=1)
+		filters ,as_dict=1)
+
+	openind_date= getdate(filters.get("from_date"))
+	date=openind_date-timedelta(days=1)
+	if gl_entries:
+		for i in gl_entries:
+			if i.get("account"):
+				opening_bal=get_balance_on(i.get("account"),date,party=None,party_type=None)
+				i['opening']=opening_bal
+				closing_bal=get_balance_on(i.get("account"),filters.get("to_date"),party=None,party_type=None)
+				i['closing']=closing_bal
+
 
 	return gl_entries
 
@@ -80,7 +91,7 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 	# Opening for filtered account
 	if filters.get("account") or filters.get("party"):
 		data += [get_balance_row(_("Opening"), opening), {}]
-
+	
 	for acc, acc_dict in gle_map.items():
 		if acc_dict.entries:
 			# Opening for individual ledger, if grouped by account
@@ -88,11 +99,10 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 				data.append(get_balance_row(_("Opening"), acc_dict.opening))
 
 			data += acc_dict.entries
-
 			# Totals and closing for individual ledger, if grouped by account
 			if filters.get("group_by_account"):
 				data += [{"account": "'" + _("Totals") + "'", "debit": acc_dict.total_debit,
-					"credit": acc_dict.total_credit },
+					"credit": acc_dict.total_credit},
 					get_balance_row(_("Closing (Opening + Totals)"),
 						(acc_dict.opening + acc_dict.total_debit - acc_dict.total_credit)), {}]
 
@@ -106,6 +116,18 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 			(opening + total_debit - total_credit)))
 
 	return data
+
+def initialize_gle_map(gl_entries):
+	gle_map = frappe._dict()
+	for gle in gl_entries:
+		gle_map.setdefault(gle.account, frappe._dict({
+			"opening": 0,
+			"entries": [],
+			"total_debit": 0,
+			"total_credit": 0,
+			"closing": 0
+		}))
+	return gle_map
 
 def initialize_gle_map(gl_entries):
 	gle_map = frappe._dict()
@@ -175,9 +197,8 @@ def get_result_as_list(data):
 					if net_activity < 0:
 						net_activity = (-1)* net_activity
 			
-		result.append([d.get("posting_date"), d.get("account"), d.get("opening_debit"),
-			d.get("opening_credit"), d.get("debit"), d.get("credit"),
-			d.get("closing_debit"),d.get("closing_credit"),net_activity,d.get("voucher_type"),d.get("voucher_no"),d.get("party") ])
+		result.append([d.get("posting_date"), d.get("account"), d.get("opening"), d.get("debit"), d.get("credit"),
+			d.get("closing"),net_activity,d.get("voucher_type"),d.get("voucher_no"),d.get("party") ])
 
 		cnt += 1
 
