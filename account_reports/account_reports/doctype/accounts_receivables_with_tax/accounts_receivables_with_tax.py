@@ -136,7 +136,6 @@ def delete_entry(voucher_type,name):
 
 #####JV################################################################################################################################
 def update_account_receivable_with_tax_entry(doc,method):
-	#frappe.errprint(doc)
 	if doc:
 		test,ledger_entries=get_general_account_entries(doc,method)
 		if 'True' in test:
@@ -442,7 +441,7 @@ def update_gl_entry_for_tax_on_cancel(gl_entry_for_tax,ledger_details,test):
 	gl_tax = frappe.get_doc('Accounts Receivables With Tax', gl_entry_for_tax[0][0])
 	if test[2]=='Sales Invoice':
 		gl_tax.outstanding_amount = gl_entry_for_tax[0][1] + ledger_details[0][1]
-		gl_tax.outstanding_tax_amount=gl_entry_for_tax[0][3] + ledger_details[0][1]
+		gl_tax.outstanding_tax_amount=gl_entry_for_tax[0][2] + ledger_details[0][1]
 
 	elif test[2] == 'Purchase Invoice':
 		gl_tax.outstanding_amount = gl_entry_for_tax[0][1] + ledger_details[0][2]

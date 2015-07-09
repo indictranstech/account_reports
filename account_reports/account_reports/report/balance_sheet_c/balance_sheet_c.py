@@ -121,7 +121,6 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 			"year_start_date": start_date,
 			"year_end_date": end_date
 		})
-		#frappe.errprint(opts)
 		if from_beginning:
 			# set start date as None for all fiscal periods, used in case of Balance Sheet
 			opts["from_date"] = None
@@ -226,7 +225,6 @@ def prepare_data(accounts, balance_must_be, period_list):
 	return out
 
 def add_total_row(out, balance_must_be, period_list):
-	#frappe.errprint(["ouuttt",out[1]])
 	row = {
 		"account_name": "'" + _("Total ({0})").format(balance_must_be) + "'",
 		"account": None
@@ -247,7 +245,6 @@ def add_total_row(out, balance_must_be, period_list):
 	out.append({})
 
 def get_accounts(company, root_type):
-	#frappe.errprint("22 get_accounts")
 	return frappe.db.sql("""select name, parent_account, lft, rgt, root_type, report_type, account_name from `tabAccount`
 		where company=%s and root_type=%s order by lft""", (company, root_type), as_dict=True)
 
