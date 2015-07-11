@@ -19,7 +19,7 @@ def create_account_receivable_with_tax_entry(doc,method):
 	elif doc.doctype=='Purchase Invoice':
 
 		sales_tax=frappe.db.sql(""" select name from `tabPurchase Taxes and Charges` where
-							parent='%s'"""%doc.name,as_list=1)
+							parent='%s' and add_deduct_tax='Add'"""%doc.name,as_list=1)
 
 	if len(sales_tax)>0:
 		if doc:
@@ -75,7 +75,7 @@ def make_tax_entry(doc,i,method):
 
 	elif doc.doctype == 'Purchase Invoice':
 		tax_details= frappe.db.sql("""select account_head,cost_center,tax_amount_after_discount_amount
-		  							from `tabPurchase Taxes and Charges` where name='%s'"""%i,as_list=1)
+		  							from `tabPurchase Taxes and Charges` where name='%s' """%i,as_list=1)
 
 	if tax_details:
 		gl_entry= frappe.new_doc('Accounts Receivables With Tax')

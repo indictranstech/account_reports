@@ -42,7 +42,7 @@ def execute(filters=None):
 					period_data[2] = period_data[0] - period_data[1]
 					if period_data[2] <0:
 						period_data[2]=period_data[2]*(-1)
-					period_data[3] = cstr((period_data[2]/period_data[0])*100) + cstr('%')
+					period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
 				elif period_data[0]==0.0 and period_data[1]==0.0:
 					period_data[3]=cstr('0%')
 
