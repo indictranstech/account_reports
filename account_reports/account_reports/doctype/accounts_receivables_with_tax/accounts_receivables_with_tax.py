@@ -325,7 +325,7 @@ def calculate_the_outstanding_tax_debit(amount,debit,test):
 	if amount==debit:
 		total_outstanding_amount= 0.0
 		debit=debit
-		paid_amount=credit
+		paid_amount=debit
 
 	elif amount>debit:
 		paid_amount=debit
