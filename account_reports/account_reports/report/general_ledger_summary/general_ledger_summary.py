@@ -63,6 +63,8 @@ def get_gl_entries(filters):
 				i['opening']=opening_bal
 				closing_bal=get_balance_on(i.get("account"),filters.get("to_date"),party=None,party_type=None)
 				i['closing']=closing_bal
+				if i['closing']<0:
+					i['closing']*=(-1)
 
 
 	return gl_entries
