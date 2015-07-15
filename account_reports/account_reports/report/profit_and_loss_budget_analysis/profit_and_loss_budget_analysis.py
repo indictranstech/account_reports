@@ -18,7 +18,7 @@ def execute(filters=None):
 
 	columns = get_columns(filters)
 
-	period_month_ranges = get_period_month_ranges(filters["period"], filters["fiscal_year"])
+	period_month_ranges = get_period_month_ranges(filters["period"], filters["fiscal_year"],filters["company"])
 
 	cam_map_income = get_costcenter_account_month_map_income(filters,'Income')
 
@@ -50,15 +50,16 @@ def execute(filters=None):
 		if row_fourth:
 			data.append(row_fourth)
 
-	if row_first and row_fourth:
-		row_fifth= get_net_profit_details(row_first[1:],row_fourth[1:])
-		if row_fifth:
-			data.append(row_fifth)
+		if row_first and row_fourth:
+			row_fifth= get_net_profit_details(row_first[1:],row_fourth[1:])
+			if row_fifth:
+				data.append(row_fifth)
 
 	return columns,data
 
 
 def get_income_details(columns,cam_map_income,period_month_ranges,month_list,data):
+	month_list=[]
 	for cost_center, cost_center_items in cam_map_income.items():
 		for account, monthwise_data in cost_center_items.items():
 			row = [cost_center]
@@ -71,7 +72,11 @@ def get_income_details(columns,cam_map_income,period_month_ranges,month_list,dat
 					month_list.append(month_data)
 
 	total_target= sum([month.get('target') for month in month_list])
+	# if total_target<0:
+	# 	total_target*=(-1)
 	total_actual= sum([month.get('actual') for month in month_list])
+	# if total_actual<0:
+	# 	total_actual*=(-1)
 	
 	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
 		if j==0:
@@ -112,10 +117,15 @@ def get_income_details(columns,cam_map_income,period_month_ranges,month_list,dat
 
 		row += period_data
 
+	elif period_data[0]>0 and period_data[1]<0:
+		period_data[2] = period_data[0] - period_data[1]
+		period_data[3] =(period_data[2]/period_data[0])*100
+		row += period_data
+
 	return row
 
 def get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,month_list,data):
-
+	month_list=[]
 	for cost_center, cost_center_items in cam_map_goods_sold.items():
 		for account, monthwise_data in cost_center_items.items():
 			row = [account]
@@ -126,9 +136,15 @@ def get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,mon
 				for month in relevant_months:
 					month_data = monthwise_data.get(month, {})
 					month_list.append(month_data)
+			
 	
 	total_target= sum([month.get('target') for month in month_list])
+	# if total_target<0:
+	# 	total_target*=(-1)
 	total_actual= sum([month.get('actual') for month in month_list])
+	# if total_actual<0:
+	# 	total_actual*=(-1)
+	
 	
 	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
 		if j==0:
@@ -168,10 +184,16 @@ def get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,mon
 			period_data[3] =(period_data[2]/period_data[0])*100
 		row += period_data
 
+	elif period_data[0]>0 and period_data[1]<0:
+		period_data[2] = period_data[0] - period_data[1]
+		period_data[3] =(period_data[2]/period_data[0])*100
+		row += period_data
+
+
 	return row
 
 def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,data):
-
+	month_list=[]
 	for cost_center, cost_center_items in cam_map_expense.items():
 		for account, monthwise_data in cost_center_items.items():
 			row = [cost_center]
@@ -184,7 +206,11 @@ def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,d
 					month_list.append(month_data)
 	
 	total_target= sum([month.get('target') for month in month_list])
+	# if total_target<0:
+	# 	total_target*=(-1)
 	total_actual= sum([month.get('actual') for month in month_list])
+	# if total_actual<0:
+	# 	total_actual*=(-1)
 	
 	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
 		if j==0:
@@ -224,6 +250,10 @@ def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,d
 		else:
 			period_data[3] =(period_data[2]/period_data[0])*100
 
+		row += period_data
+	elif period_data[0]>0 and period_data[1]<0:
+		period_data[2] = period_data[0] - period_data[1]
+		period_data[3] =(period_data[2]/period_data[0])*100
 		row += period_data
 	return row
 
@@ -241,12 +271,12 @@ def get_net_profit_details(first,fourth):
 	row+=period_data
 	return row	
 
-def get_period_month_ranges(period, fiscal_year):
+def get_period_month_ranges(period, fiscal_year,company):
 
 	from dateutil.relativedelta import relativedelta
 	period_month_ranges = []
 
-	for start_date, end_date in get_period_date_ranges(period, fiscal_year):
+	for start_date, end_date in get_period_date_ranges(period, fiscal_year,company):
 		months_in_this_period = []
 		while start_date <= end_date:
 			months_in_this_period.append(start_date.strftime("%B"))
@@ -257,9 +287,9 @@ def get_period_month_ranges(period, fiscal_year):
 	
 	return period_month_ranges
 
-def get_period_date_ranges(period, fiscal_year=None, year_start_date=None):
+def get_period_date_ranges(period, fiscal_year=None,company=None, year_start_date=None):
 	
-	month_details= get_month_details(fiscal_year,period)
+	month_details= get_month_details(fiscal_year,period,company)
 
 	period_date_ranges = []
 	
@@ -410,8 +440,8 @@ def get_data_for_goods_sold(filters,root_type):
 		(filters.get("fiscal_year"), root_type, filters.get("company")), as_dict=1)
 
 	tdd = get_target_distribution_details(filters)
-	actual_details = get_actual_details(filters)
 
+	actual_details = get_actual_details(filters)
 	cam_map_goods_sold = {}
 
 	for ccd in costcenter_target_details:
@@ -427,7 +457,6 @@ def get_data_for_goods_sold(filters,root_type):
 				if ccd.distribution_id else 100.0/12
 
 			tav_dict.target = flt(ccd.budget_allocated) * month_percentage / 100
-
 			for ad in actual_details.get(ccd.name, {}).get(ccd.account, []):
 				if ad.month_name == month:
 						tav_dict.actual += flt(ad.debit) - flt(ad.credit)

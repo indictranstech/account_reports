@@ -49,7 +49,6 @@ class ReceivablePayableReportNew(object):
 				if abs(outstanding_amount) > 0.1/10**currency_precision:
 
 					row = [gle.posting_date, gle.party]
-
 					# customer / supplier name
 					if party_naming_by == "Naming Series":
 						row += [self.get_party_name(gle.party_type, gle.party)]

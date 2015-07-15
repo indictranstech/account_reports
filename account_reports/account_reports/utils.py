@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 
 
 @frappe.whitelist()
-def get_month_details(fiscal_year,month):
+def get_month_details(fiscal_year,month,company):
 
 	fy_start_end_date = frappe.db.get_value("Fiscal Year", fiscal_year, ["year_start_date", "year_end_date"])
 	if not fy_start_end_date:
