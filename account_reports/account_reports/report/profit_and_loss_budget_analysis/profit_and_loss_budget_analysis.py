@@ -289,7 +289,7 @@ def get_period_month_ranges(period, fiscal_year,company):
 
 def get_period_date_ranges(period, fiscal_year=None,company=None, year_start_date=None):
 	
-	month_details= get_month_details(fiscal_year,period,company)
+	month_details= get_month_details(fiscal_year,period)
 
 	period_date_ranges = []
 	
