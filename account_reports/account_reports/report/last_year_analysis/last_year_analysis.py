@@ -332,16 +332,18 @@ def get_columns(period_list,period_list_last_year):
 def get_result_as_list(data,data1,period_list,period_list_last_year):
 	result = []
 	for period in period_list_last_year:
+
 		for period2 in period_list:
+
 			for l in data:
+
 				if l:
 
 					if any(d.get("account") == l.get("account") for d in data1):
-
 						val=dict((d.get("account"),d) for d in data1) 
 						l[period.key]= (val[l.get("account")]).get(period.key)
-
 						list1=['Total (Debit)','Total (Credit)','Provisional Profit / Loss (Credit)']
+						
 						if l.get("account_name"):
 
 							if l.get("account_name")[1:-1] in list1:

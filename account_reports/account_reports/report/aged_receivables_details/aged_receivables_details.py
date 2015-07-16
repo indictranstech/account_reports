@@ -60,8 +60,8 @@ class ReceivablePayableReportNew(object):
 					row += get_ageing_data(cint(self.filters.range1), cint(self.filters.range2),
 						cint(self.filters.range3), self.age_as_on, entry_date, outstanding_amount)
 
-					frappe.errprint(row)
 					data.append(row)
+					frappe.errprint(data)
 
 		return data
 

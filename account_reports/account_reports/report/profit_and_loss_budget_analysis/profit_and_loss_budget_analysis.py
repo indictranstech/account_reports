@@ -23,14 +23,11 @@ def execute(filters=None):
 	period_month_ranges = get_period_month_ranges(filters["period"], filters["fiscal_year"],filters["company"])
 
 	cam_map_income = get_costcenter_account_month_map_income(filters,'Income')
-	#frappe.errprint(cam_map_income)
 
 	cam_map_expense=get_costcenter_account_month_map_expense(filters,'Expense')
-	#frappe.errprint(cam_map_expense)
 
 	cam_map_goods_sold = get_costcenter_account_month_map_goods_sold(filters,'Expense')
-	#frappe.errprint(cam_map_goods_sold)
-
+	
 	data = []
 	month_list=[]
 	period_data = [0, 0, 0,0]
@@ -38,31 +35,26 @@ def execute(filters=None):
 	if cam_map_income:
 		row_first=get_income_details(columns,cam_map_income,period_month_ranges,month_list,data)
 		if row_first:
-			#frappe.errprint(["row_first",row_first])
 			data.append(row_first)
 
 	if cam_map_goods_sold:
 		row_second=get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,month_list,data)
 		if row_second:
-			#frappe.errprint(["row_second",row_second])
 			data.append(row_second)
 	
 		if row_first and row_second:
 			row_third=get_gross_profit(row_first[1:],row_second[1:])
 			if row_third:
-				#frappe.errprint(["row_third",row_third])
 				data.append(row_third)
 
 	if cam_map_expense:
 		row_fourth=get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,data)
 		if row_fourth:
-			#frappe.errprint(["row_fourth",row_fourth])
 			data.append(row_fourth)
 
 		if row_first and row_fourth:
 			row_fifth= get_net_profit_details(row_first[1:],row_fourth[1:])
 			if row_fifth:
-				#frappe.errprint(["row_fifth",row_fifth])
 				data.append(row_fifth)
 
 	return columns,data
@@ -82,58 +74,10 @@ def get_income_details(columns,cam_map_income,period_month_ranges,month_list,dat
 					month_list.append(month_data)
 
 	total_target= sum([month.get('target') for month in month_list])
-	# if total_target<0:
-	# 	total_target*=(-1)
 	total_actual= sum([month.get('actual') for month in month_list])
-	# if total_actual<0:
-	# 	total_actual*=(-1)
-	
-	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
-		if j==0:
-			value = total_target
-		elif j==1:
-			value=total_actual
-		period_data[j] += value
-
-	if period_data[0]>0 and period_data[1]==0:
-		period_data[2] = period_data[0] - period_data[1]
-
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
-		row += period_data
-	
-	elif period_data[0]==0 and period_data[1]>0:
-		period_data[2] = (period_data[0] - period_data[1])*(-1)
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] = 'NA'
-
-		row += period_data
-		
-	elif period_data[0]==0 and period_data[1]==0:
-		period_data[2] = 0
-		period_data[3]=0
-		row += period_data
-
-	elif period_data[0]>0 and period_data[1]>0:
-		period_data[2] = period_data[0] - period_data[1]
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
-
-		row += period_data
-
-	elif period_data[0]>0 and period_data[1]<0:
-		period_data[2] = period_data[0] - period_data[1]
-		period_data[3] =(period_data[2]/period_data[0])*100
-		row += period_data
-
+	row=get_variance_and_percentage(columns,cam_map_income,period_month_ranges,month_list,data,period_data,row,total_actual,total_target)
 	return row
-
+	
 def get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,month_list,data):
 	month_list=[]
 	for cost_center, cost_center_items in cam_map_goods_sold.items():
@@ -149,58 +93,11 @@ def get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,mon
 			
 	
 	total_target= sum([month.get('target') for month in month_list])
-	# if total_target<0:
-	# 	total_target*=(-1)
+
 	total_actual= sum([month.get('actual') for month in month_list])
-	# if total_actual<0:
-	# 	total_actual*=(-1)
-	
-	
-	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
-		if j==0:
-			value = total_target
-		elif j==1:
-			value=total_actual
-		period_data[j] += value
-		totals[j] += value
-
-	if period_data[0]>0 and period_data[1]==0:
-		period_data[2] = period_data[0] - period_data[1]
-
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
-		row += period_data
-
-	elif period_data[0]==0 and period_data[1]>0:
-		period_data[2] = (period_data[0] - period_data[1])*(-1)
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] = 'NA'
-		row += period_data
-
-	elif period_data[0]==0 and period_data[1]==0:
-		period_data[2] = 0
-		period_data[3]=0
-		row += period_data
-
-	elif period_data[0]>0 and period_data[1]>0:
-		period_data[2] = period_data[0] - period_data[1]
-		if period_data[2]==0:
-			period_data[3]=0
-		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
-		row += period_data
-
-	elif period_data[0]>0 and period_data[1]<0:
-		period_data[2] = period_data[0] - period_data[1]
-		period_data[3] =(period_data[2]/period_data[0])*100
-		row += period_data
-
-
+	row=get_variance_and_percentage(columns,cam_map_goods_sold,period_month_ranges,month_list,data,period_data,row,total_actual,total_target)
 	return row
+	
 
 def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,data):
 	month_list=[]
@@ -216,41 +113,41 @@ def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,d
 					month_list.append(month_data)
 	
 	total_target= sum([month.get('target') for month in month_list])
-	# if total_target<0:
-	# 	total_target*=(-1)
 	total_actual= sum([month.get('actual') for month in month_list])
-	# if total_actual<0:
-	# 	total_actual*=(-1)
+
+	row=get_variance_and_percentage(columns,cam_map_expense,period_month_ranges,month_list,data,period_data,row,total_actual,total_target)
+	
+	return row
+
+def get_variance_and_percentage(columns,cam_map_income,period_month_ranges,month_list,data,period_data,row,total_actual,total_target):
 	
 	for j,fieldname in enumerate(["target", "actual", "variance","diffrence"]):
 		if j==0:
-			value = total_target
+			period_data[j] += total_target
 		elif j==1:
-			value=total_actual
-		period_data[j] += value
-		totals[j] += value
+			period_data[j] += total_actual
 
 	if period_data[0]>0 and period_data[1]==0:
 		period_data[2] = period_data[0] - period_data[1]
 
 		if period_data[2]==0:
-			period_data[3]=0
+			period_data[3]=cstr('0%')
 		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
+			period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
 		row += period_data
-
+	
 	elif period_data[0]==0 and period_data[1]>0:
 		period_data[2] = (period_data[0] - period_data[1])*(-1)
 		if period_data[2]==0:
-			period_data[3]=0
+			period_data[3]=cstr('0%')
 		else:
 			period_data[3] = 'NA'
 
 		row += period_data
-
+		
 	elif period_data[0]==0 and period_data[1]==0:
 		period_data[2] = 0
-		period_data[3]=0
+		period_data[3]=cstr('0%')
 		row += period_data
 
 	elif period_data[0]>0 and period_data[1]>0:
@@ -258,14 +155,17 @@ def get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,d
 		if period_data[2]==0:
 			period_data[3]=0
 		else:
-			period_data[3] =(period_data[2]/period_data[0])*100
+			period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
 
 		row += period_data
+
 	elif period_data[0]>0 and period_data[1]<0:
 		period_data[2] = period_data[0] - period_data[1]
-		period_data[3] =(period_data[2]/period_data[0])*100
+		period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
 		row += period_data
+
 	return row
+
 
 def get_gross_profit(first,second):
 	row = ['Gross Profit']
@@ -275,8 +175,6 @@ def get_gross_profit(first,second):
 	return row
 	
 def get_net_profit_details(first,fourth):
-	# frappe.errprint(first)
-	# frappe.errprint(fourth)
 	row = ['Net Profit/Loss']
 	period_data =[0,0,0,0]
 	period_data=[cint(x) - cint(y) for x, y in zip(first, fourth)]
@@ -296,7 +194,6 @@ def get_period_month_ranges(period, fiscal_year,company):
 			start_date += relativedelta(months=1)
 		period_month_ranges.append(months_in_this_period)
 
-	# frappe.errprint(period_month_ranges)
 	return period_month_ranges
 
 def get_period_date_ranges(period, fiscal_year=None,company=None, year_start_date=None):
@@ -307,7 +204,6 @@ def get_period_date_ranges(period, fiscal_year=None,company=None, year_start_dat
 	
 	period_date_ranges.append([month_details.get('first_day'),month_details.get('end_date1')])
 
-	#frappe.errprint(period_date_ranges)
 	return period_date_ranges
 
 def get_columns(filters):
@@ -326,7 +222,7 @@ def get_columns(filters):
 			label = label % formatdate(from_date, format_string="MMM")
 			
 			columns.append(label+":Float:150")
-		columns.append(_("Diffrence Percentage") + ":Percent:120")
+		columns.append(_("Diffrence Percentage") + ":Data:120")
 
 	return columns 
 
@@ -390,16 +286,12 @@ def get_costcenter_account_month_map_goods_sold(filters,root_type):
 def get_data_for_income(filters,root_type):
 
 	costcenter_target_details = get_costcenter_target_details(filters,root_type)
-	#frappe.errprint(["get_data_for_income",costcenter_target_details])
 	tdd = get_target_distribution_details(filters)
-	#frappe.errprint(["tdd",tdd])
 	actual_details = get_actual_details(filters)
-	#frappe.errprint(["actual_details",actual_details])
 
 	cam_map_income = {}
 
 	for ccd in costcenter_target_details:
-		#frappe.errprint(["cccd",ccd])
 		for month_id in range(1, 13):
 			month = datetime.date(2013, month_id, 1).strftime('%B')
 			cam_map_income.setdefault('Income', {}).setdefault(ccd.account, {})\
@@ -408,33 +300,24 @@ def get_data_for_income(filters,root_type):
 				}))
 
 			tav_dict = cam_map_income['Income'][ccd.account][month]
-			# frappe.errprint(month)
-			#frappe.errprint(["tav_dict",tav_dict])
 			month_percentage = tdd.get(ccd.distribution_id, {}).get(month, 0) \
 				if ccd.distribution_id else 100.0/12
-			#frappe.errprint(month_percentage)
 			tav_dict.target += flt(ccd.budget_allocated) * month_percentage / 100
-			# frappe.errprint(tav_dict.target)
 
 			for ad in actual_details.get(ccd.name, {}).get(ccd.account, []):
 				if ad.month_name == month:
 						tav_dict.actual += flt(ad.debit) - flt(ad.credit)
 
-	#frappe.errprint(["cam_map_income",cam_map_income])
 	return cam_map_income
 
 
 def get_data_for_expense(filters,root_type):
 	costcenter_target_details = get_costcenter_target_details(filters,root_type)
-	# frappe.errprint(["get_data_for_income",costcenter_target_details])
 	tdd = get_target_distribution_details(filters)
-	# frappe.errprint(["tdd",tdd])
 	actual_details = get_actual_details(filters)
-	#frappe.errprint(["actual_details",actual_details])
-
 	cam_map_expense = {}
+
 	for ccd in costcenter_target_details:
-		#frappe.errprint(["cccd",ccd])
 		for month_id in range(1, 13):
 			month = datetime.date(2013, month_id, 1).strftime('%B')
 			cam_map_expense.setdefault('Expense', {}).setdefault(ccd.account, {})\
@@ -443,26 +326,20 @@ def get_data_for_expense(filters,root_type):
 				}))
 
 			tav_dict = cam_map_expense['Expense'][ccd.account][month]
-			#frappe.errprint(month)
 			month_percentage = tdd.get(ccd.distribution_id, {}).get(month, 0) \
 				if ccd.distribution_id else 100.0/12
-			#frappe.errprint(month_percentage)
 			tav_dict.target+= flt(ccd.budget_allocated) * month_percentage / 100
-			#frappe.errprint(tav_dict.target)
 			for ad in actual_details.get(ccd.name, {}).get(ccd.account, []):
 				if ad.month_name == month:
 						tav_dict.actual += flt(ad.debit) - flt(ad.credit)
 
-	#frappe.errprint(["cam_map_expense",cam_map_expense])
 	return cam_map_expense
 
 
 
 def get_data_for_goods_sold(filters,root_type):
 	abbr=frappe.db.get_value('Company', filters.get("company"), 'abbr')
-	#frappe.errprint(abbr)
 	account= cstr('Cost of Goods Sold -' ) + cstr(' ') + cstr(abbr)
-	#frappe.errprint(account)
 	cost_center_details= frappe.db.sql("""select cc.name, cc.distribution_id,
 		cc.parent_cost_center, bd.account, bd.budget_allocated,bd.root_type
 		from `tabCost Center` cc, `tabBudget Detail` bd
@@ -470,11 +347,8 @@ def get_data_for_goods_sold(filters,root_type):
 		cc.company=%s order by cc.name""" % ('%s', '%s' ,'%s','%s'),
 		(filters.get("fiscal_year"), root_type,account, filters.get("company")), as_dict=1)
 
-	#frappe.errprint(["get_data_for_income",cost_center_details])
 	tdd = get_target_distribution_details(filters)
-	#frappe.errprint(["tdd",tdd])
 	actual_details = get_actual_details(filters)
-	#frappe.errprint(["actual_details",actual_details])
 	cam_map_goods_sold = {}
 
 	for ccd in cost_center_details:
