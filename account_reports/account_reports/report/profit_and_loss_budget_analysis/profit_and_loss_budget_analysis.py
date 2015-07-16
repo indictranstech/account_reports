@@ -32,6 +32,8 @@ def execute(filters=None):
 	month_list=[]
 	period_data = [0, 0, 0,0]
 
+	row_first=[]
+	
 	abbr=frappe.db.get_value('Company', filters.get("company"), 'abbr')
 	account= cstr('Cost of Goods Sold -' ) + cstr(' ') + cstr(abbr)
 
@@ -39,34 +41,39 @@ def execute(filters=None):
 	if cam_map_income:
 		row_first=get_income_details(columns,cam_map_income,period_month_ranges,month_list,data)
 		if row_first:
-			#frappe.errprint(row_first)
 			data.append(row_first)
-		else:
-			row=['Income', 0.0, 0.0, 0.0, 0]
+	else:
+		row_first=['Income', 0.0, 0.0, 0.0, 0]
+		data.append(row_first)
 
 	if cam_map_goods_sold:
 		row_second=get_cost_of_sales_details(columns,cam_map_goods_sold,period_month_ranges,month_list,data)
 		if row_second:
 			data.append(row_second)
-		else:
-			row=[account, 0.0, 0.0, 0.0, 0]
 	
 		if row_first and row_second:
 			row_third=get_gross_profit(row_first[1:],row_second[1:])
 			if row_third:
 				data.append(row_third)
 
+	else:
+		row_second=[account, 0.0, 0.0, 0.0, 0]
+		data.append(row_first)
+
 	if cam_map_expense:
 		row_fourth=get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,data)
 		if row_fourth:
 			data.append(row_fourth)
-		else:
-			row=['Expense', 0.0, 0.0, 0.0, 0]
-
+		
 		if row_first and row_fourth:
 			row_fifth= get_net_profit_details(row_first[1:],row_fourth[1:])
 			if row_fifth:
 				data.append(row_fifth)
+
+	else:
+		row_fourth=['Expense', 0.0, 0.0, 0.0, 0]
+		data.append(row_fourth)
+
 
 	return columns,data
 
