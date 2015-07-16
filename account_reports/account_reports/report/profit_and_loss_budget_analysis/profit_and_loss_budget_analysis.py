@@ -170,14 +170,14 @@ def get_variance_and_percentage(columns,cam_map_income,period_month_ranges,month
 def get_gross_profit(first,second):
 	row = ['Gross Profit']
 	period_data =[0,0,0,0]
-	period_data=[cint(x) - cint(y) for x, y in zip(first, second)]
+	period_data=[flt(x) - flt(y) for x, y in zip(first, second)]
 	row+=period_data
 	return row
 	
 def get_net_profit_details(first,fourth):
 	row = ['Net Profit/Loss']
 	period_data =[0,0,0,0]
-	period_data=[cint(x) - cint(y) for x, y in zip(first, fourth)]
+	period_data=[flt(x) - flt(y) for x, y in zip(first, fourth)]
 	row+=period_data
 	return row	
 
