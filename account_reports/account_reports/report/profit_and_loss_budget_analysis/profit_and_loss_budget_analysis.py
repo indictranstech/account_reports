@@ -33,7 +33,7 @@ def execute(filters=None):
 	period_data = [0, 0, 0,0]
 
 	row_first=[]
-	
+
 	abbr=frappe.db.get_value('Company', filters.get("company"), 'abbr')
 	account= cstr('Cost of Goods Sold -' ) + cstr(' ') + cstr(abbr)
 
@@ -43,7 +43,7 @@ def execute(filters=None):
 		if row_first:
 			data.append(row_first)
 	else:
-		row_first=['Income', 0.0, 0.0, 0.0, 0]
+		row_first=['Income', 0.0, 0.0, 0.0, '0%']
 		data.append(row_first)
 
 	if cam_map_goods_sold:
@@ -57,8 +57,10 @@ def execute(filters=None):
 				data.append(row_third)
 
 	else:
-		row_second=[account, 0.0, 0.0, 0.0, 0]
+		row_second=[account, 0.0, 0.0, 0.0, '0%']
 		data.append(row_first)
+		row_third=['Gross Profit',0.0,0.0,0.0,'0%']
+		data.append(row_third)
 
 	if cam_map_expense:
 		row_fourth=get_expense_details(columns,cam_map_expense,period_month_ranges,month_list,data)
@@ -71,8 +73,11 @@ def execute(filters=None):
 				data.append(row_fifth)
 
 	else:
-		row_fourth=['Expense', 0.0, 0.0, 0.0, 0]
+		row_fourth=['Expense', 0.0, 0.0, 0.0, '0%']
 		data.append(row_fourth)
+		row_fifth=['Net Profit/Loss',0.0,0.0,0.0,'0%']
+		data.append(row_fifth)
+
 
 
 	return columns,data
@@ -180,6 +185,12 @@ def get_variance_and_percentage(columns,cam_map_income,period_month_ranges,month
 	elif period_data[0]>0 and period_data[1]<0:
 		period_data[2] = period_data[0] - period_data[1]
 		period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
+		row += period_data
+
+	elif period_data[0]==0 and period_data[1]<0:
+		period_data[2] = period_data[0] - period_data[1]
+		period_data[3]='NA'
+		#period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
 		row += period_data
 
 	return row
