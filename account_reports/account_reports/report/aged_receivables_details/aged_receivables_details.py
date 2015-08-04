@@ -61,7 +61,6 @@ class ReceivablePayableReportNew(object):
 						cint(self.filters.range3), self.age_as_on, entry_date, outstanding_amount)
 
 					data.append(row)
-					frappe.errprint(data)
 
 		return data
 
