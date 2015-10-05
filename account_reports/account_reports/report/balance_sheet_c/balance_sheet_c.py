@@ -58,7 +58,6 @@ def get_provisional_profit_loss(asset, liability, equity, period_list):
 				has_value = True
 
 		if has_value:
-			#frappe.errprint(provisional_profit_loss)
 			return provisional_profit_loss
 
 
@@ -83,7 +82,6 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 		}[periodicity]
 
 		period_list = []
-		frappe.errprint(["-----------",months_to_add])
 		# start with first day, so as to avoid year to_dates like 2-April if ever they occur
 		to_date = get_first_day(start_date)
 
@@ -123,7 +121,6 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 			"year_start_date": start_date,
 			"year_end_date": end_date
 		})
-		#frappe.errprint(opts)
 		if from_beginning:
 			# set start date as None for all fiscal periods, used in case of Balance Sheet
 			opts["from_date"] = None
@@ -228,13 +225,11 @@ def prepare_data(accounts, balance_must_be, period_list):
 	return out
 
 def add_total_row(out, balance_must_be, period_list):
-	#frappe.errprint(["ouuttt",out[1]])
 	row = {
 		"account_name": "'" + _("Total ({0})").format(balance_must_be) + "'",
 		"account": None
 	}
 	for period in period_list:
-		frappe.errprint(["oooooooo",out])
 		for index,value in enumerate(out):
 	
 			row[period.key] = out[index].get(period.key, 0.0)
@@ -250,7 +245,6 @@ def add_total_row(out, balance_must_be, period_list):
 	out.append({})
 
 def get_accounts(company, root_type):
-	#frappe.errprint("22 get_accounts")
 	return frappe.db.sql("""select name, parent_account, lft, rgt, root_type, report_type, account_name from `tabAccount`
 		where company=%s and root_type=%s order by lft""", (company, root_type), as_dict=True)
 
@@ -258,9 +252,7 @@ def filter_accounts(accounts, depth=10):
 	parent_children_map = {}
 	accounts_by_name = {}
 	for d in accounts:
-		#frappe.errprint(["d",d])
 		accounts_by_name[d.name] = d
-		#frappe.errprint(accounts_by_name[d.name])
 		parent_children_map.setdefault(d.parent_account or None, []).append(d)
 
 	filtered_accounts = []
@@ -297,7 +289,6 @@ def sort_root_accounts(roots):
 	roots.sort(compare_roots)
 
 def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closing_entries=False):
-	#frappe.errprint("3. get gl entries")
 	"""Returns a dict like { "account": [gl entries], ... }"""
 	additional_conditions = []
 
@@ -330,7 +321,6 @@ def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closi
 	return gl_entries_by_account
 
 def get_columns(period_list):
-	#frappe.errprint("end get_columns")
 	columns = [{
 		"fieldname": "account",
 		"label": _("Account"),

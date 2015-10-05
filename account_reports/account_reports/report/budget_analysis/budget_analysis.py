@@ -8,35 +8,44 @@ from frappe.utils import flt
 from frappe.utils import formatdate
 import time
 from erpnext.accounts.utils import get_fiscal_year
-from frappe.utils import getdate
+from frappe.utils import add_days, cint, cstr
 from account_reports.account_reports.utils import get_month_details
 
-
 def execute(filters=None):
-
 	if not filters: filters = {}
 
 	columns = get_columns(filters)
-
 	period_month_ranges = get_period_month_ranges(filters["period"], filters["fiscal_year"])
-
 	cam_map = get_costcenter_account_month_map(filters)
-	
+
 	data = []
 	for cost_center, cost_center_items in cam_map.items():
 		for account, monthwise_data in cost_center_items.items():
-			row = [account]
+			row = [cost_center, account]
 			totals = [0, 0, 0,0]
 			for relevant_months in period_month_ranges:
-				period_data = [0, 0, 0,0]
+				
+				period_data = [0, 0, 0 ,0]
 				for month in relevant_months:
+
 					month_data = monthwise_data.get(month, {})
 					for i, fieldname in enumerate(["target", "actual", "variance","diffrence"]):
 						value = flt(month_data.get(fieldname))
 						period_data[i] += value
 						totals[i] += value
-				period_data[2] = period_data[0] - period_data[1]
-				period_data[3] =(period_data[2]/period_data[0])*100
+				if period_data[0] == 0.0 and period_data[1]!=0.0:
+					period_data[2] = period_data[0] - period_data[1]
+					if period_data[2] <0:
+						period_data[2]=period_data[2]*(-1)
+					period_data[3]= 'NA'
+				elif period_data[0]>0:
+					period_data[2] = period_data[0] - period_data[1]
+					if period_data[2] <0:
+						period_data[2]=period_data[2]*(-1)
+					period_data[3] = cstr(round(flt((period_data[2]/period_data[0])*100),2)) + cstr('%')
+				elif period_data[0]==0.0 and period_data[1]==0.0:
+					period_data[3]=cstr('0%')
+
 				row += period_data
 			totals[2] = totals[0] - totals[1]
 			row += totals
@@ -54,7 +63,6 @@ def get_period_month_ranges(period, fiscal_year):
 		months_in_this_period = []
 		while start_date <= end_date:
 			months_in_this_period.append(start_date.strftime("%B"))
-
 			start_date += relativedelta(months=1)
 		period_month_ranges.append(months_in_this_period)
 
@@ -72,38 +80,33 @@ def get_period_date_ranges(period, fiscal_year=None, year_start_date=None):
 	return period_date_ranges
 
 def get_columns(filters):
-
 	for fieldname in ["fiscal_year", "period", "company"]:
 		if not filters.get(fieldname):
 			label = (" ".join(fieldname.split("_"))).title()
 			msgprint(_("Please specify") + ": " + label,
 				raise_exception=True)
 
-	columns = [ _("Account") + ":Link/Account:120"]
+	columns = [_("Cost Center") + ":Link/Cost Center:120", _("Account") + ":Link/Account:120"]
 
-	
+	group_months = False if filters["period"] == "Monthly" else True
+
 	for from_date, to_date in get_period_date_ranges(filters["period"], filters["fiscal_year"]):
 		for label in [_("Budgeted") + " (%s)", _("Selected Period") + " (%s)", _("Diffrence") + " (%s)"]:
 			label = label % formatdate(from_date, format_string="MMM")
-			
-			columns.append(label+":Float:150")
-		columns.append(_("Diffrence Percentage") + ":Percent:120")
+
+			columns.append(label+":Float:120")
+		columns.append(_("Diffrence Percentage") + ":Data:120")
 
 	return columns 
 
-
 #Get cost center & target details
 def get_costcenter_target_details(filters):
-
-	cost_center_details= frappe.db.sql("""select cc.name, cc.distribution_id,
+	return frappe.db.sql("""select cc.name, cc.distribution_id,
 		cc.parent_cost_center, bd.account, bd.budget_allocated
 		from `tabCost Center` cc, `tabBudget Detail` bd
 		where bd.parent=cc.name and bd.fiscal_year=%s and
 		cc.company=%s order by cc.name""" % ('%s', '%s'),
 		(filters.get("fiscal_year"), filters.get("company")), as_dict=1)
-	
-	return cost_center_details
-
 
 #Get target distribution details of accounts of cost center
 def get_target_distribution_details(filters):
@@ -115,7 +118,6 @@ def get_target_distribution_details(filters):
 			target_details.setdefault(d.name, {}).setdefault(d.month, flt(d.percentage_allocation))
 
 	return target_details
-
 
 #Get actual details from gl entry
 def get_actual_details(filters):
@@ -130,12 +132,9 @@ def get_actual_details(filters):
 	for d in ac_details:
 		cc_actual_details.setdefault(d.cost_center, {}).setdefault(d.account, []).append(d)
 
-	
 	return cc_actual_details
-	
 
 def get_costcenter_account_month_map(filters):
-
 	import datetime
 	costcenter_target_details = get_costcenter_target_details(filters)
 	tdd = get_target_distribution_details(filters)
@@ -162,5 +161,5 @@ def get_costcenter_account_month_map(filters):
 			for ad in actual_details.get(ccd.name, {}).get(ccd.account, []):
 				if ad.month_name == month:
 						tav_dict.actual += flt(ad.debit) - flt(ad.credit)
-	
+						
 	return cam_map

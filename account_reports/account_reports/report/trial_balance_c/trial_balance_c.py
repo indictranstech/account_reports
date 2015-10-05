@@ -9,7 +9,6 @@ from erpnext.accounts.report.financial_statements import filter_accounts, get_gl
 from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate, nowdate, \
 	get_first_day, get_last_day,money_in_words, now, nowtime
 
-#from account_reports.account_reports.utils import get_fiscal_year
 
 value_fields = ("opening_debit", "opening_credit", "debit", "credit", "closing_debit", "closing_credit","ytd_debit","ytd_credit")
 
@@ -24,8 +23,6 @@ def validate_filters(filters):
 		["year_start_date", "year_end_date"])
 	filters.year_start_date = getdate(filters.year_start_date)
 	filters.year_end_date = getdate(filters.year_end_date)
-
-
 
 	if not filters.from_date:
 		filters.from_date = filters.year_start_date

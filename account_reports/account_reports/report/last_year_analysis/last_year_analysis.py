@@ -331,38 +331,40 @@ def get_columns(period_list,period_list_last_year):
 
 def get_result_as_list(data,data1,period_list,period_list_last_year):
 	result = []
-
 	for period in period_list_last_year:
+
 		for period2 in period_list:
+
 			for l in data:
-				
-				if any(d.get("account") == l.get("account") for d in data1):
 
-					val=dict((d.get("account"),d) for d in data1) 
-					l[period.key]= (val[l.get("account")]).get(period.key)
+				if l:
 
-					list1=['Total (Debit)','Total (Credit)','Provisional Profit / Loss (Credit)']
-					if l.get("account_name"):
-
-						if l.get("account_name")[1:-1] in list1:
+					if any(d.get("account") == l.get("account") for d in data1):
+						val=dict((d.get("account"),d) for d in data1) 
+						l[period.key]= (val[l.get("account")]).get(period.key)
+						list1=['Total (Debit)','Total (Credit)','Provisional Profit / Loss (Credit)']
 						
-							for t in data1:
+						if l.get("account_name"):
 
-								if t.get("account_name"):
+							if l.get("account_name")[1:-1] in list1:
+							
+								for t in data1:
 
-									if t.get("account_name")[1:-1] == l.get("account_name")[1:-1]:
+									if t.get("account_name"):
 
-										l[period.key]= t.get(period.key)
-										l['diffrence'] = l.get(period2.key)-l.get(period.key)
-										diff= (l.get("diffrence")/l.get(period.key))*100
-										
-										if diff:
-											l['diffrence_percentage'] =diff
-										
-				if l.get("parent_account") and l.get(period2.key) and l.get(period.key):
+										if t.get("account_name")[1:-1] == l.get("account_name")[1:-1]:
+											l[period.key]= t.get(period.key)
+											l['diffrence'] = l.get(period2.key)-l.get(period.key)
+											diff= (l.get("diffrence")/l.get(period.key))*100
+											
+											if diff:
+												l['diffrence_percentage'] =diff
+											
+					if l.get("parent_account") and l.get(period2.key) and l.get(period.key):
 
-					l['diffrence']	= (l.get(period2.key))- l.get(period.key)
+						l['diffrence']	= (l.get(period2.key))- l.get(period.key)
+				
+		 				l['diffrence_percentage'] = (l.get("diffrence")/l.get(period.key))*100
+
 			
-	 				l['diffrence_percentage'] = (l.get("diffrence")/l.get(period.key))*100
-
 	return data
