@@ -35,8 +35,7 @@ def execute(filters=None):
 	row_first=[]
 
 	abbr=frappe.db.get_value('Company', filters.get("company"), 'abbr')
-	account= cstr('Cost of Goods Sold -' ) + cstr(' ') + cstr(abbr)
-
+	default_account= cstr('Cost of Goods Sold -' ) + cstr(' ') + cstr(abbr)
 
 	if cam_map_income:
 		row_first=get_income_details(columns,cam_map_income,period_month_ranges,month_list,data)
@@ -57,8 +56,8 @@ def execute(filters=None):
 				data.append(row_third)
 
 	else:
-		row_second=[account, 0.0, 0.0, 0.0, '0%']
-		data.append(row_first)
+		row_second=[default_account, 0.0, 0.0, 0.0, '0%']
+		data.append(row_second)
 		row_third=['Gross Profit',0.0,0.0,0.0,'0%']
 		data.append(row_third)
 
