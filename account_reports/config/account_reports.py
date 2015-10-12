@@ -10,6 +10,13 @@ def get_data():
 			"items": [
 				{
 					"type": "report",
+					"name": "Profit and Loss Statement Reports",
+					"label": "Profit and Loss Statement",
+					"doctype": "GL Entry",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
 					"name": "Trial Balance C",
 					"label": "Trial Balance",
 					"doctype": "GL Entry",
