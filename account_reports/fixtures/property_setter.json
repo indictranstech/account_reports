@@ -440,5 +440,44 @@
   "property": "previous_field", 
   "property_type": "Data", 
   "value": "account_subtype"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Supplier", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "supplier_gst_type", 
+  "modified": "2015-12-01 12:19:48.111490", 
+  "name": "Supplier-supplier_gst_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "supplier_name"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Purchase Invoice", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "supplier_gst_type", 
+  "modified": "2015-12-01 12:21:56.179180", 
+  "name": "Purchase Invoice-supplier_gst_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "supplier_name"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "GST Details", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "supplier_gst_type", 
+  "modified": "2015-12-01 12:27:14.152991", 
+  "name": "GST Details-supplier_gst_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "supplier_name"
  }
 ]
