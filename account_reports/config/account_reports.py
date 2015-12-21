@@ -49,17 +49,24 @@ def get_data():
 					"doctype": "GL Entry",
 					"is_query_report": True
 				},
+				# {
+				# 	"type": "report",
+				# 	"name": "GST Sales Details",
+				# 	"label": "GST Sales Details",
+				# 	"doctype": "GST Details",
+				# 	"is_query_report": True
+				# },
+				# {
+				# 	"type": "report",
+				# 	"name": "GST Purchase Details",
+				# 	"label": "GST Purchase Details",
+				# 	"doctype": "GST Details",
+				# 	"is_query_report": True
+				# },
 				{
 					"type": "report",
-					"name": "GST Sales Details",
-					"label": "GST Sales Details",
-					"doctype": "GST Details",
-					"is_query_report": True
-				},
-				{
-					"type": "report",
-					"name": "GST Purchase Details",
-					"label": "GST Purchase Details",
+					"name": "GST Details of Sales and Purchase",
+					"label": "GST - Sales and Purchase Details",
 					"doctype": "GST Details",
 					"is_query_report": True
 				},
