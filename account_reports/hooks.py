@@ -71,8 +71,14 @@ fixtures = ['Custom Field', 'Property Setter']
 doc_events = {
 
 	"Sales Invoice": {
-		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry",
-		"on_cancel": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
+		"on_submit": [
+			"erpnext.accounts.doctype.gst_details.gst_details.set_gst_details",
+			"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+		],
+		"on_cancel": [
+			"erpnext.accounts.doctype.gst_details.gst_details.del_cst_details_record",
+			"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
+		]
 
 	},
 	"Journal Entry": {
@@ -81,8 +87,14 @@ doc_events = {
 
 	},
 	"Purchase Invoice": {
-		"on_submit": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry",
-		"on_cancel": "account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
+		"on_submit": [
+			"erpnext.accounts.doctype.gst_details.gst_details.set_gst_details_of_pi",
+			"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.create_account_receivable_with_tax_entry"
+		],
+		"on_cancel": [
+			"erpnext.accounts.doctype.gst_details.gst_details.del_cst_details_record",
+			"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
+		]
 
 	}
 
