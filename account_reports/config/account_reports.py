@@ -66,7 +66,7 @@ def get_data():
 				{
 					"type": "report",
 					"name": "GST Details of Sales and Purchase",
-					"label": "GST - Sales and Purchase Details",
+					"label": "Sales and Purchase Details of GST",
 					"doctype": "GST Details",
 					"is_query_report": True
 				},

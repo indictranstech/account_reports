@@ -443,19 +443,6 @@
  }, 
  {
   "default_value": null, 
-  "doc_type": "Supplier", 
-  "docstatus": 0, 
-  "doctype": "Property Setter", 
-  "doctype_or_field": "DocField", 
-  "field_name": "supplier_gst_type", 
-  "modified": "2015-12-17 12:52:59.451084", 
-  "name": "Supplier-supplier_gst_type-previous_field", 
-  "property": "previous_field", 
-  "property_type": "Data", 
-  "value": "supplier_name"
- }, 
- {
-  "default_value": null, 
   "doc_type": "GST Details", 
   "docstatus": 0, 
   "doctype": "Property Setter", 
@@ -479,19 +466,6 @@
   "property": "previous_field", 
   "property_type": "Data", 
   "value": "customer_gst_type"
- }, 
- {
-  "default_value": null, 
-  "doc_type": "GST Details", 
-  "docstatus": 0, 
-  "doctype": "Property Setter", 
-  "doctype_or_field": "DocField", 
-  "field_name": "gst_type_abbreviation", 
-  "modified": "2015-12-18 11:31:05.711453", 
-  "name": "GST Details-gst_type_abbreviation-previous_field", 
-  "property": "previous_field", 
-  "property_type": "Data", 
-  "value": "cs_gst_type"
  }, 
  {
   "default_value": null, 
@@ -586,19 +560,6 @@
  }, 
  {
   "default_value": null, 
-  "doc_type": "Customer", 
-  "docstatus": 0, 
-  "doctype": "Property Setter", 
-  "doctype_or_field": "DocField", 
-  "field_name": "customer_gst_type", 
-  "modified": "2015-12-22 11:29:27.633744", 
-  "name": "Customer-customer_gst_type-previous_field", 
-  "property": "previous_field", 
-  "property_type": "Data", 
-  "value": "lead_name"
- }, 
- {
-  "default_value": null, 
   "doc_type": "Supplier", 
   "docstatus": 0, 
   "doctype": "Property Setter", 
@@ -635,5 +596,44 @@
   "property": "previous_field", 
   "property_type": "Data", 
   "value": "supplier_name"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "GST Details", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "gst_type_abbreviation", 
+  "modified": "2015-12-22 16:33:26.580675", 
+  "name": "GST Details-gst_type_abbreviation-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "gst_type"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Supplier", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "supplier_gst_type", 
+  "modified": "2016-01-18 18:14:05.003868", 
+  "name": "Supplier-supplier_gst_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "supplier_name"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Customer", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "customer_gst_type", 
+  "modified": "2016-01-18 18:14:14.206016", 
+  "name": "Customer-customer_gst_type-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "lead_name"
  }
 ]
