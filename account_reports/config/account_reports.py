@@ -42,13 +42,13 @@ def get_data():
 					"label":"General Ledger",
 					"is_query_report": True,
 				},
-				{
-					"type": "report",
-					"name": "Profit and Loss Statement Reports",
-					"label": "Profit and Loss Statement",
-					"doctype": "GL Entry",
-					"is_query_report": True
-				},
+				# {
+				# 	"type": "report",
+				# 	"name": "Profit and Loss Statement Reports",
+				# 	"label": "Profit and Loss Statement",
+				# 	"doctype": "GL Entry",
+				# 	"is_query_report": True
+				# },
 				# {
 				# 	"type": "report",
 				# 	"name": "GST Sales Details",
