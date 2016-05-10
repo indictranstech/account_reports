@@ -96,13 +96,14 @@ doc_events = {
 			"account_reports.account_reports.doctype.accounts_receivables_with_tax.accounts_receivables_with_tax.delete_gl_entry"
 		]
 
-	},
-	"Customer": {
-		"validate": "erpnext.accounts.doctype.gst_details.gst_details.validate_cust_gst_type"			
-	},
-	"Supplier": {
-		"validate": "erpnext.accounts.doctype.gst_details.gst_details.validate_supp_gst_type"			
 	}
+	# ,
+	# "Customer": {
+	# 	"validate": "erpnext.accounts.doctype.gst_details.gst_details.validate_cust_gst_type"			
+	# },
+	# "Supplier": {
+	# 	"validate": "erpnext.accounts.doctype.gst_details.gst_details.validate_supp_gst_type"			
+	# }
 
 }
 
