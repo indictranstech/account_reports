@@ -41,7 +41,7 @@ app_version = "0.0.1"
 # Installation
 # ------------
 
-fixtures = ['Custom Field', 'Property Setter']
+fixtures = ['Custom Field', 'Property Setter', 'Print Format']
 
 # before_install = "account_reports.install.before_install"
 # after_install = "account_reports.install.after_install"
