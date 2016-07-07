@@ -1038,5 +1038,57 @@
   "property": "previous_field", 
   "property_type": "Data", 
   "value": "mode_of_payment"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Sales Order Item", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-07-06 12:09:47.320059", 
+  "name": "Sales Order Item-_idx", 
+  "property": "_idx", 
+  "property_type": "Text", 
+  "value": "[\"item_code\", \"cost_center\", \"customer_item_code\", \"col_break1\", \"item_name\", \"section_break_5\", \"description\", \"column_break_7\", \"image\", \"image_view\", \"quantity_and_rate\", \"qty\", \"price_list_rate\", \"discount_percentage\", \"col_break2\", \"stock_uom\", \"base_price_list_rate\", \"section_break_simple1\", \"rate\", \"amount\", \"col_break3\", \"base_rate\", \"base_amount\", \"pricing_rule\", \"section_break_24\", \"net_rate\", \"net_amount\", \"column_break_27\", \"base_net_rate\", \"base_net_amount\", \"warehouse_and_reference\", \"warehouse\", \"prevdoc_docname\", \"brand\", \"item_group\", \"page_break\", \"col_break4\", \"projected_qty\", \"actual_qty\", \"delivered_qty\", \"billed_amt\", \"planned_qty\", \"produced_qty\", \"item_tax_rate\", \"transaction_date\"]"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Sales Order Item", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-07-06 12:10:24.245624", 
+  "name": "Sales Order Item-read_only_onload", 
+  "property": "read_only_onload", 
+  "property_type": "Check", 
+  "value": null
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Purchase Order Item", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-07-06 12:13:04.724978", 
+  "name": "Purchase Order Item-_idx", 
+  "property": "_idx", 
+  "property_type": "Text", 
+  "value": "[\"item_code\", \"supplier_part_no\", \"item_name\", \"column_break_4\", \"schedule_date\", \"cost_center\", \"section_break_5\", \"description\", \"col_break1\", \"image\", \"image_view\", \"quantity_and_rate\", \"qty\", \"stock_uom\", \"col_break2\", \"uom\", \"conversion_factor\", \"sec_break1\", \"price_list_rate\", \"discount_percentage\", \"col_break3\", \"base_price_list_rate\", \"sec_break2\", \"rate\", \"amount\", \"col_break4\", \"base_rate\", \"base_amount\", \"pricing_rule\", \"section_break_29\", \"net_rate\", \"net_amount\", \"column_break_32\", \"base_net_rate\", \"base_net_amount\", \"warehouse_and_reference\", \"warehouse\", \"project_name\", \"prevdoc_doctype\", \"prevdoc_docname\", \"prevdoc_detail_docname\", \"supplier_quotation\", \"supplier_quotation_item\", \"col_break5\", \"item_group\", \"brand\", \"bom\", \"stock_qty\", \"received_qty\", \"billed_amt\", \"item_tax_rate\", \"page_break\"]"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Purchase Order Item", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-07-06 12:13:18.736832", 
+  "name": "Purchase Order Item-read_only_onload", 
+  "property": "read_only_onload", 
+  "property_type": "Check", 
+  "value": null
  }
 ]
